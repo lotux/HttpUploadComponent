@@ -13,6 +13,7 @@ import string
 import sys
 import time
 import yaml
+import urllib
 
 from sleekxmpp.componentxmpp import ComponentXMPP
 from threading import Event
@@ -183,7 +184,7 @@ class HttpHandler(BaseHTTPRequestHandler):
         global files
         global files_lock
         global config
-        path = normalize_path(self.path[1:])
+        path = normalize_path(self.path[1:]).decode('utf8')
         length = int(self.headers['Content-Length'])
         maxfilesize = int(config['max_file_size'])
         if config['user_quota_hard']:
@@ -195,6 +196,8 @@ class HttpHandler(BaseHTTPRequestHandler):
         else:
             print('path: '+path)
             files_lock.acquire()
+	    print path
+            print files
             if path in files:
                 files.remove(path)
                 files_lock.release()
@@ -219,7 +222,7 @@ class HttpHandler(BaseHTTPRequestHandler):
 
     def do_GET(self, body=True):
         global config
-        path = normalize_path(self.path[1:])
+        path = urllib.unquote(normalize_path(self.path[1:])).decode('utf8')
         slashcount = path.count('/')
         if path[0] in ('/', '\\') or slashcount < 1 or slashcount > 2:
             self.send_response(404,'file not found')
