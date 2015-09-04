@@ -196,8 +196,6 @@ class HttpHandler(BaseHTTPRequestHandler):
         else:
             print('path: '+path)
             files_lock.acquire()
-	    print path
-            print files
             if path in files:
                 files.remove(path)
                 files_lock.release()
